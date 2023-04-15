@@ -63,6 +63,9 @@ class UpdateEventMonitor {
     this.#historyEvents.sort(
       (event0, event1) => event0.startBlockNumber - event1.startBlockNumber
     );
+
+    // we can continue to merge entries so the array become super small and check is fast. But the array size is really small, 
+    // <20K entries since genesis block, this should be optional
   }
 
   /**
