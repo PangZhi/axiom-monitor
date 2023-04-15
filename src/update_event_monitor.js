@@ -68,7 +68,7 @@ class UpdateEventMonitor {
    * Add udpate events to the monitor and the events should be up to latestBlock
    * @param {[UpdateEvent]} events
    * @param {number} latestBlock
-   * @returns [MonitorStatus, MonitorStatus, [[number, number]]] originalStatus, newStatus, missingBlocks. 
+   * @returns [MonitorStatus, MonitorStatus, [[number, number]]] originalStatus, newStatus, missingBlocks.
    * Missingblock is [startBlockNumber, lastBlockNumber], left side inclusive, right side exclusive
    */
   checkAndUpdateMonitorStatus(events, latestBlock) {
@@ -107,7 +107,9 @@ class UpdateEventMonitor {
 
     if (startBlock > 0) {
       if (startBlock === 17031168) {
-        console.log('Missing block [0, 17031168], however, we ignore this missing block as it is in v0 contract');
+        console.log(
+          "Missing block [0, 17031168], however, we ignore this missing block as it is in v0 contract"
+        );
       } else {
         missingBlocks.push([0, startBlock]);
       }
@@ -124,7 +126,10 @@ class UpdateEventMonitor {
     }
 
     if (nextBlock < latestBlock - this.#missing_threshold) {
-      missingBlocks.push([nextBlock, latestBlock - this.#missing_threshold + 1]);
+      missingBlocks.push([
+        nextBlock,
+        latestBlock - this.#missing_threshold + 1,
+      ]);
     }
 
     return missingBlocks;

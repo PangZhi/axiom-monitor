@@ -1,4 +1,7 @@
-const { UpdateEventMonitor, MonitorStatus } = require("../src/update_event_monitor");
+const {
+  UpdateEventMonitor,
+  MonitorStatus,
+} = require("../src/update_event_monitor");
 const { UpdateEvent } = require("../src/update_event");
 
 describe("Add Event", () => {
@@ -79,14 +82,12 @@ describe("Get Missing Blocks", () => {
     expect(missingBlocks[1]).toEqual([1152, 2048]);
   });
 
-
   test("Return correctly for empty events", () => {
     let eventMonitor = new UpdateEventMonitor();
     let missingBlocks = eventMonitor.getMissingBlocks(1192);
     expect(missingBlocks.length).toBe(1);
     expect(missingBlocks[0]).toEqual([0, 1001]);
   });
-
 
   test("Return correctly for missing right ranges", () => {
     let eventMonitor = new UpdateEventMonitor();
@@ -116,62 +117,115 @@ describe("Get Missing Blocks", () => {
       let events = [];
       events.push(new UpdateEvent(0, 1024));
       events.push(new UpdateEvent(1024, 128));
-      let firstResult = eventMonitor.checkAndUpdateMonitorStatus(events, 1024 + 128);
-      expect(firstResult).toEqual([MonitorStatus.IN_SYNC, MonitorStatus.IN_SYNC, []]);
+      let firstResult = eventMonitor.checkAndUpdateMonitorStatus(
+        events,
+        1024 + 128
+      );
+      expect(firstResult).toEqual([
+        MonitorStatus.IN_SYNC,
+        MonitorStatus.IN_SYNC,
+        [],
+      ]);
 
       let events1 = [];
       events1.push(new UpdateEvent(1024, 256));
       events1.push(new UpdateEvent(1024, 512));
-      let secondResult = eventMonitor.checkAndUpdateMonitorStatus(events1, 1024 + 512);
-      expect(secondResult).toEqual([MonitorStatus.IN_SYNC, MonitorStatus.IN_SYNC, []]);
-    })
+      let secondResult = eventMonitor.checkAndUpdateMonitorStatus(
+        events1,
+        1024 + 512
+      );
+      expect(secondResult).toEqual([
+        MonitorStatus.IN_SYNC,
+        MonitorStatus.IN_SYNC,
+        [],
+      ]);
+    });
 
     test("stay out of sync", () => {
-      
       let eventMonitor = new UpdateEventMonitor();
       let events = [];
       events.push(new UpdateEvent(0, 128));
       events.push(new UpdateEvent(1024, 128));
-      let firstResult = eventMonitor.checkAndUpdateMonitorStatus(events, 1024 + 128);
-      expect(firstResult).toEqual([MonitorStatus.IN_SYNC, MonitorStatus.OUT_OF_SYNC, [[128, 1024]]]);
+      let firstResult = eventMonitor.checkAndUpdateMonitorStatus(
+        events,
+        1024 + 128
+      );
+      expect(firstResult).toEqual([
+        MonitorStatus.IN_SYNC,
+        MonitorStatus.OUT_OF_SYNC,
+        [[128, 1024]],
+      ]);
 
-      
       let events1 = [];
       events1.push(new UpdateEvent(1024, 256));
       events1.push(new UpdateEvent(1024, 512));
-      let secondResult = eventMonitor.checkAndUpdateMonitorStatus(events1, 1024 + 512);
-      expect(secondResult).toEqual([MonitorStatus.OUT_OF_SYNC, MonitorStatus.OUT_OF_SYNC, [[128, 1024]]]);
-    })
+      let secondResult = eventMonitor.checkAndUpdateMonitorStatus(
+        events1,
+        1024 + 512
+      );
+      expect(secondResult).toEqual([
+        MonitorStatus.OUT_OF_SYNC,
+        MonitorStatus.OUT_OF_SYNC,
+        [[128, 1024]],
+      ]);
+    });
 
     test("in sync -> out of sync", () => {
       let eventMonitor = new UpdateEventMonitor();
       let events = [];
       events.push(new UpdateEvent(0, 1024));
       events.push(new UpdateEvent(1024, 128));
-      let firstResult = eventMonitor.checkAndUpdateMonitorStatus(events, 1024 + 128);
-      expect(firstResult).toEqual([MonitorStatus.IN_SYNC, MonitorStatus.IN_SYNC, []]);
+      let firstResult = eventMonitor.checkAndUpdateMonitorStatus(
+        events,
+        1024 + 128
+      );
+      expect(firstResult).toEqual([
+        MonitorStatus.IN_SYNC,
+        MonitorStatus.IN_SYNC,
+        [],
+      ]);
 
       let events1 = [];
       events1.push(new UpdateEvent(1024, 256));
       events1.push(new UpdateEvent(1024, 512));
-      let secondResult = eventMonitor.checkAndUpdateMonitorStatus(events1, 1024 + 1024);
-      expect(secondResult).toEqual([MonitorStatus.IN_SYNC, MonitorStatus.OUT_OF_SYNC, [[1536, 2048 - 192 + 1]]]);
-    })
+      let secondResult = eventMonitor.checkAndUpdateMonitorStatus(
+        events1,
+        1024 + 1024
+      );
+      expect(secondResult).toEqual([
+        MonitorStatus.IN_SYNC,
+        MonitorStatus.OUT_OF_SYNC,
+        [[1536, 2048 - 192 + 1]],
+      ]);
+    });
 
     test("out of sync -> in sync", () => {
       let eventMonitor = new UpdateEventMonitor();
       let events = [];
       events.push(new UpdateEvent(0, 128));
       events.push(new UpdateEvent(1024, 128));
-      let firstResult = eventMonitor.checkAndUpdateMonitorStatus(events, 1024 + 128);
-      expect(firstResult).toEqual([MonitorStatus.IN_SYNC, MonitorStatus.OUT_OF_SYNC, [[128, 1024]]]);
+      let firstResult = eventMonitor.checkAndUpdateMonitorStatus(
+        events,
+        1024 + 128
+      );
+      expect(firstResult).toEqual([
+        MonitorStatus.IN_SYNC,
+        MonitorStatus.OUT_OF_SYNC,
+        [[128, 1024]],
+      ]);
 
       let events1 = [];
       events1.push(new UpdateEvent(0, 1024));
       events1.push(new UpdateEvent(1024, 512));
-      let secondResult = eventMonitor.checkAndUpdateMonitorStatus(events1, 1024 + 512);
-      expect(secondResult).toEqual([MonitorStatus.OUT_OF_SYNC, MonitorStatus.IN_SYNC, []]);
-
-    })
-  })
+      let secondResult = eventMonitor.checkAndUpdateMonitorStatus(
+        events1,
+        1024 + 512
+      );
+      expect(secondResult).toEqual([
+        MonitorStatus.OUT_OF_SYNC,
+        MonitorStatus.IN_SYNC,
+        [],
+      ]);
+    });
+  });
 });

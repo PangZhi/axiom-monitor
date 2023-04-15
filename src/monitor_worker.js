@@ -1,6 +1,7 @@
 const Web3 = require("web3");
 const { UpdateEvent } = require("./update_event");
 const { UpdateEventMonitor, MonitorStatus } = require("./update_event_monitor");
+const retry = require("async-retry");
 
 const PROVIDER_URL = process.env.PROVIDER_URL;
 if (!PROVIDER_URL) {
@@ -30,15 +31,19 @@ class MonitorWorker {
   }
 
   async monitor() {
-    // todo: retry on network error
-    let latestBlock = await getLatestBlockNumber();
+    let latestBlock = await retry(getLatestBlockNumber, { retries: 3 });
 
-    // todo: retry on network error
     // todo: handle reorg
-    var events = await this.#contract.getPastEvents(this.#eventName, {
-      fromBlock: this.#eventMonitor.getLastUpdatedBlockNumber(),
-      toBlock: latestBlock,
-    });
+    let events = await retry(
+      () =>
+        this.#contract.getPastEvents(this.#eventName, {
+          fromBlock: this.#eventMonitor.getLastUpdatedBlockNumber(),
+          toBlock: latestBlock,
+        }),
+      {
+        retries: 3,
+      }
+    );
 
     console.log(
       `Get ${
@@ -84,7 +89,6 @@ const getLatestBlockNumber = async () => {
   const currentBlock = await web3.eth.getBlockNumber();
   return currentBlock;
 };
-
 const runMonitor = async () => {
   let worker = new MonitorWorker(contract, "UpdateEvent");
   try {
