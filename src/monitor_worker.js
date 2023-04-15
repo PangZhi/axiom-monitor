@@ -15,6 +15,7 @@ const AXIOM_ABI = require("../resources/axiom_abi.json");
 const AXIOM_CONTRACT = "0xF990f9CB1A0aa6B51c0720a6f4cAe577d7AbD86A";
 const contract = new web3.eth.Contract(AXIOM_ABI, AXIOM_CONTRACT);
 
+const REORG_THRESHOLD = 6;
 /**
  * start a worker for a monitor, call monitor() to start the monitoring thread
  */
@@ -33,11 +34,17 @@ class MonitorWorker {
   async monitor() {
     let latestBlock = await retry(getLatestBlockNumber, { retries: 3 });
 
-    // todo: handle reorg
+    // This is a simple way to handle reorg, we just pay attention to the blocks considered to be finalized
+    // If we want to be more accurate and always use block tip, we need to also record the block number when 
+    // the event is emitted, and also purge the events that's added during reorged blocks
+    latestBlock -= REORG_THRESHOLD;
+
+    let fromBlock =  this.#eventMonitor.getLastUpdatedBlockNumber() + 1;
     let events = await retry(
       () =>
         this.#contract.getPastEvents(this.#eventName, {
-          fromBlock: this.#eventMonitor.getLastUpdatedBlockNumber(),
+          // the monitor is able to handle duplication, but start from the next block to be accurate
+          fromBlock: fromBlock,
           toBlock: latestBlock,
         }),
       {
@@ -48,7 +55,7 @@ class MonitorWorker {
     console.log(
       `Get ${
         events.length
-      } new events for block ${this.#eventMonitor.getLastUpdatedBlockNumber()} to ${latestBlock}`
+      } new events for block ${fromBlock} to ${latestBlock}`
     );
 
     let updateEvents = [];

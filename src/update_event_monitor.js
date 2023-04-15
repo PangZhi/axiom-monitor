@@ -17,7 +17,8 @@ class UpdateEventMonitor {
 
   constructor(missing_threshold = 192) {
     this.#historyEvents = [];
-    this.#lastUpdatedBlockNumber = 0;
+    // -1 means this monitor has not been initialized
+    this.#lastUpdatedBlockNumber = -1;
     this.#status = MonitorStatus.IN_SYNC;
     this.#missing_threshold = missing_threshold;
   }
