@@ -37,7 +37,7 @@ class MonitorWorker {
     // todo: handle reorg
     var events = await this.#contract.getPastEvents(this.#eventName, {
       fromBlock: this.#eventMonitor.getLastUpdatedBlockNumber(),
-      toBlock: latestBlock 
+      toBlock: latestBlock,
     });
 
     console.log(
@@ -60,11 +60,9 @@ class MonitorWorker {
       this.#eventMonitor.checkAndUpdateMonitorStatus(updateEvents, latestBlock);
     if (oldStatus === MonitorStatus.IN_SYNC) {
       if (newStatus === MonitorStatus.OUT_OF_SYNC) {
-        console.log(
-          `Updater become out of sync, find missing blocks`
-        );
+        console.log(`Updater become out of sync, find missing blocks`);
 
-        missingBlocks.forEach(element => console.log(element));
+        missingBlocks.forEach((element) => console.log(element));
       } else {
         console.log(`Updater is still in sync`);
       }
@@ -72,11 +70,8 @@ class MonitorWorker {
       if (newStatus === MonitorStatus.IN_SYNC) {
         console.log(`Updater alert resolved, it is in sync`);
       } else {
-        console.log(
-          `Updater is still out of sync, find missing blocks`
-        );
-        missingBlocks.forEach(element => console.log(element));
-
+        console.log(`Updater is still out of sync, find missing blocks`);
+        missingBlocks.forEach((element) => console.log(element));
       }
     }
 
@@ -100,5 +95,5 @@ const runMonitor = async () => {
 };
 
 module.exports = {
-  runMonitor
-}
+  runMonitor,
+};

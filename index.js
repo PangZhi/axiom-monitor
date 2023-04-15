@@ -1,3 +1,3 @@
-const {runMonitor} = require("./src/monitor_worker");
+const { runMonitor } = require("./src/monitor_worker");
 
-runMonitor()
+runMonitor();

@@ -68,7 +68,8 @@ class UpdateEventMonitor {
    * Add udpate events to the monitor and the events should be up to latestBlock
    * @param {[UpdateEvent]} events
    * @param {number} latestBlock
-   * @returns [MonitorStatus, MonitorStatus, [[number, number]]] originalStatus, newStatus, missingBlocks
+   * @returns [MonitorStatus, MonitorStatus, [[number, number]]] originalStatus, newStatus, missingBlocks. 
+   * Missingblock is [startBlockNumber, lastBlockNumber], left side inclusive, right side exclusive
    */
   checkAndUpdateMonitorStatus(events, latestBlock) {
     for (let event of events) {
@@ -95,9 +96,22 @@ class UpdateEventMonitor {
   getMissingBlocks(latestBlock) {
     let missingBlocks = [];
 
-    if (this.#historyEvents.length == 0) return [];
+    if (this.#historyEvents.length == 0) {
+      // +1 as right side is exclusive
+      missingBlocks.push([0, latestBlock - this.#missing_threshold + 1]);
+      return missingBlocks;
+    }
+
     let startBlock = this.#historyEvents[0].startBlockNumber;
     let nextBlock = this.#historyEvents[0].getFinalBlockNumber();
+
+    if (startBlock > 0) {
+      if (startBlock === 17031168) {
+        console.log('Missing block [0, 17031168], however, we ignore this missing block as it is in v0 contract');
+      } else {
+        missingBlocks.push([0, startBlock]);
+      }
+    }
 
     for (let i = 1; i < this.#historyEvents.length; ++i) {
       let newStartBlock = this.#historyEvents[i].startBlockNumber;
@@ -110,7 +124,7 @@ class UpdateEventMonitor {
     }
 
     if (nextBlock < latestBlock - this.#missing_threshold) {
-      missingBlocks.push([nextBlock, latestBlock - this.#missing_threshold]);
+      missingBlocks.push([nextBlock, latestBlock - this.#missing_threshold + 1]);
     }
 
     return missingBlocks;
