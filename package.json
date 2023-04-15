@@ -1,0 +1,19 @@
+{
+  "name": "axiom-monitor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "web3": "^1.9.0"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "prettier": "2.8.7"
+  }
+}
